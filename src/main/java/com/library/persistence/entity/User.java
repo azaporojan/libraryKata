@@ -1,39 +1,38 @@
 package com.library.persistence.entity;
 
-import com.library.rest.dto.UserDTO;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Entity(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
+import java.util.Objects;
+import java.util.Set;
+
+@Data
+@Entity
+@Table(name = "library_user", uniqueConstraints = @UniqueConstraint(columnNames = {"email", "phone_number"}))
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
-    @Column(name = "first_name", unique = false, nullable = false)
+    @Column(name = "first_name")
     private String firstName;
-
-    @Column(name = "last_name", unique = false, nullable = false)
+    @Column(name = "last_name")
     private String lastName;
+    @Column(name = "email")
+    private String email;
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    @OneToMany
+    private Set<Book> borrowedBooks;
 
-    @Column(name = "address", unique = false, nullable = false)
-    private String address;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
+    }
 
-    @Column(name = "passport_number", unique = true, nullable = false)
-    private String passportNumber;
-
-
-    public UserDTO toDTO(){
-        UserDTO dto = new UserDTO();
-        dto.setFirstName(firstName);
-        dto.setLastName(lastName);
-        dto.setAddress(address);
-        dto.setPassportNumber(passportNumber);
-        return dto;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, email, phoneNumber);
     }
 }
